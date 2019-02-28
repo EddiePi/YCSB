@@ -33,6 +33,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -43,6 +46,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class RocksDBClient extends DB {
 
   static final String PROPERTY_ROCKSDB_DIR = "rocksdb.dir";
+
   private static final String COLUMN_FAMILY_NAMES_FILENAME = "CF_NAMES";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RocksDBClient.class);
@@ -51,6 +55,11 @@ public class RocksDBClient extends DB {
   @GuardedBy("RocksDBClient.class") private static RocksObject dbOptions = null;
   @GuardedBy("RocksDBClient.class") private static RocksDB rocksDb = null;
   @GuardedBy("RocksDBClient.class") private static int references = 0;
+
+  // Edit by Eddie
+  static final String PROPERTY_LOCK_MEMORY = "lock_memory";
+  private Boolean lockMemory = false;
+  CStdLib c;
 
   private static final ConcurrentMap<String, ColumnFamily> COLUMN_FAMILIES = new ConcurrentHashMap<>();
   private static final ConcurrentMap<String, Lock> COLUMN_FAMILY_LOCKS = new ConcurrentHashMap<>();
@@ -61,6 +70,13 @@ public class RocksDBClient extends DB {
       if(rocksDb == null) {
         rocksDbDir = Paths.get(getProperties().getProperty(PROPERTY_ROCKSDB_DIR));
         LOGGER.info("RocksDB data dir: " + rocksDbDir);
+        // Edit by Eddie
+        lockMemory = Boolean.valueOf(getProperties().getProperty(PROPERTY_LOCK_MEMORY, "false"));
+
+        if (lockMemory) {
+          c = Native.load("c", CStdLib.class);
+          System.out.println("mlockall: " + c.syscall(151, 2));
+        }
 
         try {
           rocksDb = initRocksDB();
@@ -136,6 +152,9 @@ public class RocksDBClient extends DB {
 
     synchronized (RocksDBClient.class) {
       try {
+        if (lockMemory && c != null) {
+          c.syscall(152);
+        }
         if (references == 1) {
           for (final ColumnFamily cf : COLUMN_FAMILIES.values()) {
             cf.getHandle().close();
@@ -391,5 +410,9 @@ public class RocksDBClient extends DB {
     public ColumnFamilyOptions getOptions() {
       return options;
     }
+  }
+
+  protected interface CStdLib extends Library {
+    int syscall (int number, Object... args);
   }
 }
