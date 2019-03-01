@@ -33,8 +33,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
+//import com.sun.jna.Library;
+//import com.sun.jna.Native;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -57,9 +57,9 @@ public class RocksDBClient extends DB {
   @GuardedBy("RocksDBClient.class") private static int references = 0;
 
   // Edit by Eddie
-  static final String PROPERTY_LOCK_MEMORY = "lock_memory";
-  private static Boolean lockMemory = false;
-  private static CStdLib c;
+  // static final String PROPERTY_LOCK_MEMORY = "lock_memory";
+  // private static Boolean lockMemory = false;
+  // private static CStdLib c;
 
   private static final ConcurrentMap<String, ColumnFamily> COLUMN_FAMILIES = new ConcurrentHashMap<>();
   private static final ConcurrentMap<String, Lock> COLUMN_FAMILY_LOCKS = new ConcurrentHashMap<>();
@@ -71,17 +71,12 @@ public class RocksDBClient extends DB {
         rocksDbDir = Paths.get(getProperties().getProperty(PROPERTY_ROCKSDB_DIR));
         LOGGER.info("RocksDB data dir: " + rocksDbDir);
         // Edit by Eddie
-        lockMemory = Boolean.valueOf(getProperties().getProperty(PROPERTY_LOCK_MEMORY, "false"));
+        //lockMemory = Boolean.valueOf(getProperties().getProperty(PROPERTY_LOCK_MEMORY, "false"));
 
-        if (lockMemory) {
-          c = Native.load("c", CStdLib.class);
-          int LOCK_STATUS = c.syscall(151, 2);
-	  if (LOCK_STATUS == 0) {
-		LOGGER.info("memory locked for future access");
-	  } else {
-	  	LOGGER.error("memory locked failed. please check permission.");
-	  }
-        }
+        //if (lockMemory) {
+        //  c = Native.load("c", CStdLib.class);
+        //  System.out.println("mlockall: " + c.syscall(151, 2));
+        //}
 
         try {
           rocksDb = initRocksDB();
@@ -157,9 +152,9 @@ public class RocksDBClient extends DB {
 
     synchronized (RocksDBClient.class) {
       try {
-        if (lockMemory && c != null) {
-          c.syscall(152);
-        }
+        //if (lockMemory && c != null) {
+        //  c.syscall(152);
+        //}
         if (references == 1) {
           for (final ColumnFamily cf : COLUMN_FAMILIES.values()) {
             cf.getHandle().close();
@@ -417,7 +412,7 @@ public class RocksDBClient extends DB {
     }
   }
 
-  protected interface CStdLib extends Library {
-    int syscall (int number, Object... args);
-  }
+  //protected interface CStdLib extends Library {
+  //  int syscall (int number, Object... args);
+  //}
 }

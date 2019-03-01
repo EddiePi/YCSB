@@ -37,11 +37,11 @@ LICENSE file.
   </scm>
   <dependencyManagement>
     <dependencies>
-      <!--dependency>
+      <dependency>
         <groupId>com.puppycrawl.tools</groupId>
         <artifactId>checkstyle</artifactId>
         <version>7.7.1</version>
-      </dependency-->
+      </dependency>
       <dependency>
         <groupId>org.jdom</groupId>
         <artifactId>jdom</artifactId>
@@ -167,13 +167,13 @@ LICENSE file.
 
   <build>
     <pluginManagement>
-      <!--plugins>
+      <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>2.16</version>
         </plugin>
-      </plugins-->
+      </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
@@ -205,7 +205,7 @@ LICENSE file.
           <target>1.8</target>
         </configuration>
       </plugin>
-      <!--plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <executions>
@@ -220,7 +220,7 @@ LICENSE file.
             </configuration>
           </execution>
         </executions>
-      </plugin-->
+      </plugin>
     </plugins>
   </build>
 </project>
