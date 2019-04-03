@@ -81,7 +81,7 @@ public class RedisClient extends DB {
       jedisClusterNodes.add(new HostAndPort(host, port));
       jedis = new JedisCluster(jedisClusterNodes);
     } else {
-      jedis = new Jedis(host, port);
+      jedis = new Jedis(host, port, 10000);
       ((Jedis) jedis).connect();
     }
 
