@@ -67,6 +67,9 @@ public class RocksDBClient extends DB {
   @Override
   public void init() throws DBException {
     synchronized(RocksDBClient.class) {
+      String processName =
+      java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
+      LOGGER.info("RocksDB Client PID: " + processName);
       if(rocksDb == null) {
         rocksDbDir = Paths.get(getProperties().getProperty(PROPERTY_ROCKSDB_DIR));
         LOGGER.info("RocksDB data dir: " + rocksDbDir);

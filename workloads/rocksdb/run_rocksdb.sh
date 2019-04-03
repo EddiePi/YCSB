@@ -17,6 +17,6 @@ else
 
         cd /home/epi/YCSB
         DATA_SIZE=$1
-        sudo env "PATH=$PATH" taskset -c 58-63 bin/ycsb run rocksdb -P workloads/$workload -P workloads/$DATA_SIZE -p operationcount=$operations -p rocksdb.dir=/tmp/ycsb-rocksdb-data -cp ./rocksdb/target/dependency/slf4j-simple-1.7.25.jar -p lock_memory=true
+        sudo env "PATH=$PATH" taskset -c 58-63 bin/ycsb run rocksdb -P workloads/$workload -P workloads/$DATA_SIZE -p operationcount=$operations -p rocksdb.dir=/tmp/ycsb-rocksdb-data -cp ./rocksdb/target/dependency/slf4j-simple-1.7.25.jar -p lock_memory=false
 fi
 
